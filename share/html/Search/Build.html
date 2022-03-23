@@ -249,6 +249,7 @@ if ( @parse_results ) {
     push @actions, @parse_results;
     return $m->comp(
         "Edit.html",
+        Class => $Class,
         Query => $query{'Query'},
         Format => $query{'Format'},
         SavedSearchId => $saved_search{'Id'},
