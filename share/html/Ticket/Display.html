@@ -162,6 +162,18 @@ if ($ARGS{'id'} eq 'new') {
             SkipProcessing => \$SkipProcessing );
         return if $SkipProcessing;
 
+        my ($status, @msg) = $m->comp(
+            '/Elements/ValidateCustomFields',
+            Object       => $TicketObj,
+            CustomFields => $TicketObj->CustomFields,
+            ARGSRef      => \%ARGS,
+        );
+        unless ($status) {
+            push @Actions, @msg;
+            $SkipProcessing = 1;
+            return;
+        }
+
         if ( defined $ARGS{'Action'} ) {
             if ($ARGS{'Action'} =~ /^(Steal|Delete|Take|Untake|SetTold)$/) {
                 my $action = $1;
