@@ -120,9 +120,33 @@ sub Connect {
         $ENV{'NLS_NCHAR'} = "AL32UTF8";
     }
 
+    # Prevent RT from connecting without a password. For some installations, an empty
+    # password might indicate that we couldn't read our RT config, and repeated attempts
+    # to connect to the database without a password may lock the db account RT uses.
+    # Here we attempt to mitigate that outcome, and determine why we have no password.
+    #
+    # Sometimes, you might want to allow this. If so, you'll need to specifically enable
+    # AllowEmptyDatabasePassword in your RT config to account for this.
+
+    my $dbpassword = RT->Config->Get('DatabasePassword');
+    if( !$dbpassword or $dbpassword eq '' ) {
+        if( !RT->Config->Get('AllowEmptyDatabasePassword') ) {
+            # Password is empty, and it's not supposed to be.
+            if( !RT->Config->LoadedConfigs ) {
+                # No configs are loaded, so try to load them again. If this was because of permissions,
+                # we should have already, but for the sake of being paranoid, try to load them again.
+                # Either they will load, or fail and we'll get told why.
+                RT->LoadConfig;
+            } else {
+                die "Cannot start RT with an empty password. Check your RT configuration\n" .
+                    "and make sure you've provided a database password.\n";
+            }
+        }
+    }
+
     $self->SUPER::Connect(
         User => RT->Config->Get('DatabaseUser'),
-        Password => RT->Config->Get('DatabasePassword'),
+        Password => $dbpassword,
         DisconnectHandleOnDestroy => 1,
         %args,
     );

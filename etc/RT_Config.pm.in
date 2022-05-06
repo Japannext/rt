@@ -281,6 +281,14 @@ during upgrades.
 
 Set($DatabaseAdmin, "@DB_DBA@");
 
+=item C<$AllowEmptyDatabasePassword>
+
+Allow RT to use an empty database password. B<NOT> recommended!
+
+=cut
+
+Set($AllowEmptyDatabasePassword, 0);
+
 =back
 
 

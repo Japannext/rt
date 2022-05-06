@@ -765,6 +765,9 @@ our %META;
         Immutable => 1,
         Widget    => '/Widgets/Form/String',
     },
+    AllowEmptyDatabasePassword => {
+        Widget => '/Widgets/Form/Boolean',
+    },
 
     FullTextSearch => {
         Type => 'HASH',
